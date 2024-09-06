@@ -1,56 +1,58 @@
 plugins {
     id 'java'
-    id 'distribution'
 }
 
-group = 'com.vkosheliuk'
+group = 'com.example'
 version = '1.0-SNAPSHOT'
 
+// Setting a custom artifact name
+archivesBaseName = 'vkosheliuk'
+
 sourceCompatibility = '11'
+targetCompatibility = '11'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 }
 
-tasks.jar {
-    manifest {
-        attributes(
-            'Main-Class': 'com.vkosheliuk.Main'
-        )
-    }
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+test {
+    useJUnitPlatform()
 }
 
-// Custom task: build-custom
-task buildCustom(type: Jar) {
+// Custom task to build the project
+task buildCustom(type: GradleBuild) {
     dependsOn build
-    from sourceSets.main.output
-    manifest {
-        attributes('Implementation-Title': 'vkosheliuk', 'Implementation-Version': version)
+    doLast {
+        println 'Custom build task completed'
     }
 }
 
-// Custom task: hello
+// Custom task to run tests
+task testCustom(type: GradleBuild) {
+    dependsOn buildCustom, test
+    doLast {
+        println 'Custom test task completed'
+    }
+}
+
+// Custom hello task
 task hello {
     dependsOn testCustom
     doLast {
-        println 'Hello from the vkosheliuk project!'
+        println 'Hello from custom task!'
     }
 }
 
-
-distributions {
-    main {
-        contents {
-            from('src/main/resources')
-            from('build/libs')
-        }
-    }
+// Task to create a distribution artifact
+task distZip(type: Zip) {
+    from 'src'
+    archiveFileName = "${archivesBaseName}-${version}.zip"
+    destinationDirectory = file("$buildDir/distributions")
 }
+
+build.finalizedBy distZip

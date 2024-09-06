@@ -25,7 +25,7 @@ test {
 }
 
 // Custom task to build the project
-task buildCustom(type: GradleBuild) {
+task build(type: GradleBuild) {
     dependsOn build
     doLast {
         println 'Custom build task completed'
@@ -33,7 +33,7 @@ task buildCustom(type: GradleBuild) {
 }
 
 // Custom task to run tests
-task testCustom(type: GradleBuild) {
+task test(type: GradleBuild) {
     dependsOn buildCustom, test
     doLast {
         println 'Custom test task completed'
@@ -42,7 +42,7 @@ task testCustom(type: GradleBuild) {
 
 // Custom hello task
 task hello {
-    dependsOn testCustom
+    dependsOn test
     doLast {
         println 'Hello from custom task!'
     }
